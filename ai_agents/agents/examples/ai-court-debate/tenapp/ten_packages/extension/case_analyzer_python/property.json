@@ -1,0 +1,26 @@
+{
+  "case_info": {
+    "case_number": "",
+    "case_type": "criminal",
+    "role": "defendant",
+    "description": "案件基本信息",
+    "facts": [],
+    "evidence": [],
+    "defendant_statement": "",
+    "prosecution_claims": []
+  },
+  "debate_strategy": {
+    "focus_points": [
+      "事实认定",
+      "证据充分性",
+      "法律适用",
+      "量刑建议"
+    ],
+    "defense_principles": [
+      "无罪推定",
+      "疑罪从无",
+      "罪刑法定",
+      "证据确实充分"
+    ]
+  }
+}

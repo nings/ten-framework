@@ -1,0 +1,57 @@
+version: '3'
+
+tasks:
+  install:
+    desc: "安装依赖"
+    dir: tenapp
+    cmds:
+      - tman install
+
+  build:
+    desc: "构建项目"
+    dir: tenapp
+    cmds:
+      - mkdir -p bin
+      - go build -o bin/app main.go
+    sources:
+      - "**/*.go"
+      - "**/*.py"
+    generates:
+      - bin/app
+
+  run:
+    desc: "运行项目"
+    dir: tenapp
+    deps: [build]
+    cmds:
+      - ./bin/app
+
+  clean:
+    desc: "清理构建文件"
+    dir: tenapp
+    cmds:
+      - rm -rf bin/
+      - rm -rf ten_packages/*/bin/
+
+  docker-build:
+    desc: "构建 Docker 镜像"
+    cmds:
+      - docker build -t ai-court-debate:latest .
+
+  docker-run:
+    desc: "运行 Docker 容器"
+    deps: [docker-build]
+    cmds:
+      - docker run --env-file .env -p 8080:8080 ai-court-debate:latest
+
+  test:
+    desc: "运行测试"
+    dir: tenapp
+    cmds:
+      - echo "Running tests..."
+      - go test ./...
+
+  help:
+    desc: "显示帮助信息"
+    cmds:
+      - task --list

@@ -1,0 +1,47 @@
+{
+  "type": "extension",
+  "name": "court_debate_control_python",
+  "version": "0.1.0",
+  "language": "python",
+  "dependencies": [
+    {
+      "type": "system",
+      "name": "ten_runtime_python",
+      "version": "0.11"
+    }
+  ],
+  "api": {
+    "cmd_in": [
+      {
+        "name": "on_user_joined"
+      },
+      {
+        "name": "on_user_left"
+      },
+      {
+        "name": "tool_register"
+      }
+    ],
+    "cmd_out": [
+      {
+        "name": "flush"
+      }
+    ],
+    "data_in": [
+      {
+        "name": "asr_result"
+      }
+    ],
+    "data_out": [
+      {
+        "name": "tts_text_input"
+      },
+      {
+        "name": "tts_flush"
+      },
+      {
+        "name": "message"
+      }
+    ]
+  }
+}

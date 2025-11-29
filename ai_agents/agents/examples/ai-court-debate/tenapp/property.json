@@ -1,0 +1,230 @@
+{
+  "ten": {
+    "predefined_graphs": [
+      {
+        "name": "ai_court_debate",
+        "auto_start": true,
+        "graph": {
+          "nodes": [
+            {
+              "type": "extension",
+              "name": "agora_rtc",
+              "addon": "agora_rtc",
+              "extension_group": "default",
+              "property": {
+                "app_id": "${env:AGORA_APP_ID}",
+                "app_certificate": "${env:AGORA_APP_CERTIFICATE|}",
+                "channel": "court_debate_channel",
+                "stream_id": 1234,
+                "remote_stream_id": 123,
+                "subscribe_audio": true,
+                "publish_audio": true,
+                "publish_data": true,
+                "enable_agora_asr": false
+              }
+            },
+            {
+              "type": "extension",
+              "name": "stt",
+              "addon": "deepgram_asr_python",
+              "extension_group": "stt",
+              "property": {
+                "params": {
+                  "api_key": "${env:DEEPGRAM_API_KEY}",
+                  "language": "zh-CN",
+                  "model": "nova-3"
+                }
+              }
+            },
+            {
+              "type": "extension",
+              "name": "llm",
+              "addon": "openai_llm2_python",
+              "extension_group": "chatgpt",
+              "property": {
+                "base_url": "https://api.openai.com/v1",
+                "api_key": "${env:OPENAI_API_KEY}",
+                "frequency_penalty": 0.9,
+                "model": "${env:OPENAI_MODEL}",
+                "max_tokens": 1024,
+                "prompt": "你是一位经验丰富的法律AI助手，专门协助进行法庭辩论和答辩。\n\n你的职责是：\n1. 仔细聆听法官和对方的问题\n2. 基于案件事实和法律条文提供专业的答辩意见\n3. 引用相关法律法规支持你的观点\n4. 保持专业、客观、有理有据的态度\n5. 在必要时调用法律知识库和案情分析工具\n\n请始终遵循以下法律原则：\n- 无罪推定：在判决前应假定被告无罪\n- 疑罪从无：证据不足时应作出有利于被告的判断\n- 证据确实充分：定罪需要达到排除合理怀疑的证明标准\n- 罪刑法定：法无明文规定不为罪、不处罚\n\n在回答时要：\n- 简明扼要，逻辑清晰\n- 重点突出，有理有据\n- 引用具体法律条文\n- 结合案件事实进行分析\n\n你可以使用以下工具：\n- search_legal_knowledge: 搜索相关法律条文\n- analyze_case: 分析案件情况和策略",
+                "proxy_url": "${env:OPENAI_PROXY_URL|}",
+                "greeting": "法庭AI辩护助手已就绪。我将基于法律和事实为您提供专业的答辩意见。",
+                "max_memory_length": 20
+              }
+            },
+            {
+              "type": "extension",
+              "name": "tts",
+              "addon": "elevenlabs_tts2_python",
+              "extension_group": "tts",
+              "property": {
+                "dump": false,
+                "dump_path": "./",
+                "params": {
+                  "key": "${env:ELEVENLABS_TTS_KEY}",
+                  "model_id": "eleven_multilingual_v2",
+                  "voice_id": "pNInz6obpgDQGcFmaJgB",
+                  "output_format": "pcm_16000"
+                }
+              }
+            },
+            {
+              "type": "extension",
+              "name": "main_control",
+              "addon": "court_debate_control_python",
+              "extension_group": "control",
+              "property": {
+                "greeting": "法庭AI辩护助手已就绪。我将基于法律和事实为您提供专业的答辩意见。请问有什么问题？"
+              }
+            },
+            {
+              "type": "extension",
+              "name": "message_collector",
+              "addon": "message_collector2",
+              "extension_group": "transcriber",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "streamid_adapter",
+              "addon": "streamid_adapter",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "legal_knowledge",
+              "addon": "legal_knowledge_python",
+              "extension_group": "tools",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "case_analyzer",
+              "addon": "case_analyzer_python",
+              "extension_group": "tools",
+              "property": {
+                "case_info": {
+                  "case_number": "案号待定",
+                  "case_type": "criminal",
+                  "role": "defendant",
+                  "description": "刑事辩护案件",
+                  "facts": [],
+                  "evidence": [],
+                  "defendant_statement": "",
+                  "prosecution_claims": []
+                }
+              }
+            }
+          ],
+          "connections": [
+            {
+              "extension": "main_control",
+              "cmd": [
+                {
+                  "names": [
+                    "on_user_joined",
+                    "on_user_left"
+                  ],
+                  "source": [
+                    {
+                      "extension": "agora_rtc"
+                    }
+                  ]
+                },
+                {
+                  "names": [
+                    "tool_register"
+                  ],
+                  "source": [
+                    {
+                      "extension": "legal_knowledge"
+                    },
+                    {
+                      "extension": "case_analyzer"
+                    }
+                  ]
+                }
+              ],
+              "data": [
+                {
+                  "name": "asr_result",
+                  "source": [
+                    {
+                      "extension": "stt"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "extension": "agora_rtc",
+              "audio_frame": [
+                {
+                  "name": "pcm_frame",
+                  "dest": [
+                    {
+                      "extension": "streamid_adapter"
+                    }
+                  ]
+                },
+                {
+                  "name": "pcm_frame",
+                  "source": [
+                    {
+                      "extension": "tts"
+                    }
+                  ]
+                }
+              ],
+              "data": [
+                {
+                  "name": "data",
+                  "source": [
+                    {
+                      "extension": "message_collector"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "extension": "streamid_adapter",
+              "audio_frame": [
+                {
+                  "name": "pcm_frame",
+                  "dest": [
+                    {
+                      "extension": "stt"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "log": {
+      "handlers": [
+        {
+          "matchers": [
+            {
+              "level": "info"
+            }
+          ],
+          "formatter": {
+            "type": "plain",
+            "colored": true
+          },
+          "emitter": {
+            "type": "console",
+            "config": {
+              "stream": "stdout"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
