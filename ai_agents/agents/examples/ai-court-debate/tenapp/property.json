@@ -2,7 +2,7 @@
   "ten": {
     "predefined_graphs": [
       {
-        "name": "ai_court_debate",
+        "name": "ai_court_debate_deepseek",
         "auto_start": true,
         "graph": {
           "nodes": [
@@ -42,15 +42,14 @@
               "addon": "openai_llm2_python",
               "extension_group": "chatgpt",
               "property": {
-                "base_url": "https://api.openai.com/v1",
-                "api_key": "${env:OPENAI_API_KEY}",
-                "frequency_penalty": 0.9,
-                "model": "${env:OPENAI_MODEL}",
-                "max_tokens": 1024,
-                "prompt": "你是一位经验丰富的法律AI助手，专门协助进行法庭辩论和答辩。\n\n你的职责是：\n1. 仔细聆听法官和对方的问题\n2. 基于案件事实和法律条文提供专业的答辩意见\n3. 引用相关法律法规支持你的观点\n4. 保持专业、客观、有理有据的态度\n5. 在必要时调用法律知识库和案情分析工具\n\n请始终遵循以下法律原则：\n- 无罪推定：在判决前应假定被告无罪\n- 疑罪从无：证据不足时应作出有利于被告的判断\n- 证据确实充分：定罪需要达到排除合理怀疑的证明标准\n- 罪刑法定：法无明文规定不为罪、不处罚\n\n在回答时要：\n- 简明扼要，逻辑清晰\n- 重点突出，有理有据\n- 引用具体法律条文\n- 结合案件事实进行分析\n\n你可以使用以下工具：\n- search_legal_knowledge: 搜索相关法律条文\n- analyze_case: 分析案件情况和策略",
-                "proxy_url": "${env:OPENAI_PROXY_URL|}",
-                "greeting": "法庭AI辩护助手已就绪。我将基于法律和事实为您提供专业的答辩意见。",
-                "max_memory_length": 20
+                "base_url": "https://api.deepseek.com/v1",
+                "api_key": "${env:DEEPSEEK_API_KEY}",
+                "model": "deepseek-chat",
+                "max_tokens": 2048,
+                "frequency_penalty": 0.5,
+                "prompt": "你是一位经验丰富的中国法律AI助手，专门协助进行法庭辩论和答辩。\n\n你的职责是：\n1. 仔细聆听法官和对方的问题\n2. 基于案件事实和中国现行法律条文提供专业的答辩意见\n3. 引用具体的法律条文编号和内容\n4. 保持专业、客观、有理有据的态度\n5. 在必要时调用法律知识库和案情分析工具\n\n请始终遵循以下法律原则：\n- 无罪推定：在判决前应假定被告无罪\n- 疑罪从无：证据不足时应作出有利于被告的判断\n- 证据确实充分：定罪需要达到排除合理怀疑的证明标准\n- 罪刑法定：法无明文规定不为罪、不处罚\n\n在回答时要：\n- 使用标准法律用语\n- 逻辑清晰，重点突出\n- 引用《刑法》《民法典》等具体条文\n- 结合案件事实进行分析\n\n可用工具：\n- search_legal_knowledge: 搜索相关法律条文\n- analyze_case: 分析案件情况和辩论策略",
+                "greeting": "法庭AI辩护助手（DeepSeek驱动）已就绪。我将基于中国法律和案件事实为您提供专业答辩。",
+                "max_memory_length": 30
               }
             },
             {
@@ -75,7 +74,7 @@
               "addon": "court_debate_control_python",
               "extension_group": "control",
               "property": {
-                "greeting": "法庭AI辩护助手已就绪。我将基于法律和事实为您提供专业的答辩意见。请问有什么问题？"
+                "greeting": "法庭AI辩护助手已就绪（DeepSeek驱动）。我将基于法律和事实为您提供专业答辩意见。请问有什么问题？"
               }
             },
             {
@@ -122,38 +121,21 @@
               "extension": "main_control",
               "cmd": [
                 {
-                  "names": [
-                    "on_user_joined",
-                    "on_user_left"
-                  ],
-                  "source": [
-                    {
-                      "extension": "agora_rtc"
-                    }
-                  ]
+                  "names": ["on_user_joined", "on_user_left"],
+                  "source": [{"extension": "agora_rtc"}]
                 },
                 {
-                  "names": [
-                    "tool_register"
-                  ],
+                  "names": ["tool_register"],
                   "source": [
-                    {
-                      "extension": "legal_knowledge"
-                    },
-                    {
-                      "extension": "case_analyzer"
-                    }
+                    {"extension": "legal_knowledge"},
+                    {"extension": "case_analyzer"}
                   ]
                 }
               ],
               "data": [
                 {
                   "name": "asr_result",
-                  "source": [
-                    {
-                      "extension": "stt"
-                    }
-                  ]
+                  "source": [{"extension": "stt"}]
                 }
               ]
             },
@@ -162,29 +144,17 @@
               "audio_frame": [
                 {
                   "name": "pcm_frame",
-                  "dest": [
-                    {
-                      "extension": "streamid_adapter"
-                    }
-                  ]
+                  "dest": [{"extension": "streamid_adapter"}]
                 },
                 {
                   "name": "pcm_frame",
-                  "source": [
-                    {
-                      "extension": "tts"
-                    }
-                  ]
+                  "source": [{"extension": "tts"}]
                 }
               ],
               "data": [
                 {
                   "name": "data",
-                  "source": [
-                    {
-                      "extension": "message_collector"
-                    }
-                  ]
+                  "source": [{"extension": "message_collector"}]
                 }
               ]
             },
@@ -193,11 +163,683 @@
               "audio_frame": [
                 {
                   "name": "pcm_frame",
-                  "dest": [
-                    {
-                      "extension": "stt"
-                    }
+                  "dest": [{"extension": "stt"}]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "ai_court_debate_qwen",
+        "auto_start": false,
+        "graph": {
+          "nodes": [
+            {
+              "type": "extension",
+              "name": "agora_rtc",
+              "addon": "agora_rtc",
+              "extension_group": "default",
+              "property": {
+                "app_id": "${env:AGORA_APP_ID}",
+                "app_certificate": "${env:AGORA_APP_CERTIFICATE|}",
+                "channel": "court_debate_channel",
+                "stream_id": 1234,
+                "remote_stream_id": 123,
+                "subscribe_audio": true,
+                "publish_audio": true,
+                "publish_data": true,
+                "enable_agora_asr": false
+              }
+            },
+            {
+              "type": "extension",
+              "name": "stt",
+              "addon": "deepgram_asr_python",
+              "extension_group": "stt",
+              "property": {
+                "params": {
+                  "api_key": "${env:DEEPGRAM_API_KEY}",
+                  "language": "zh-CN",
+                  "model": "nova-3"
+                }
+              }
+            },
+            {
+              "type": "extension",
+              "name": "llm",
+              "addon": "openai_llm2_python",
+              "extension_group": "chatgpt",
+              "property": {
+                "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+                "api_key": "${env:DASHSCOPE_API_KEY}",
+                "model": "qwen-max",
+                "max_tokens": 2048,
+                "frequency_penalty": 0.5,
+                "prompt": "你是一位经验丰富的中国法律AI助手，专门协助进行法庭辩论和答辩。\n\n你的职责是：\n1. 仔细聆听法官和对方的问题\n2. 基于案件事实和中国现行法律条文提供专业的答辩意见\n3. 引用具体的法律条文编号和内容\n4. 保持专业、客观、有理有据的态度\n5. 在必要时调用法律知识库和案情分析工具\n\n请始终遵循以下法律原则：\n- 无罪推定：在判决前应假定被告无罪\n- 疑罪从无：证据不足时应作出有利于被告的判断\n- 证据确实充分：定罪需要达到排除合理怀疑的证明标准\n- 罪刑法定：法无明文规定不为罪、不处罚\n\n在回答时要：\n- 使用标准法律用语\n- 逻辑清晰，重点突出\n- 引用《刑法》《民法典》等具体条文\n- 结合案件事实进行分析\n\n可用工具：\n- search_legal_knowledge: 搜索相关法律条文\n- analyze_case: 分析案件情况和辩论策略",
+                "greeting": "法庭AI辩护助手（通义千问驱动）已就绪。我将基于中国法律和案件事实为您提供专业答辩。",
+                "max_memory_length": 30
+              }
+            },
+            {
+              "type": "extension",
+              "name": "tts",
+              "addon": "elevenlabs_tts2_python",
+              "extension_group": "tts",
+              "property": {
+                "dump": false,
+                "dump_path": "./",
+                "params": {
+                  "key": "${env:ELEVENLABS_TTS_KEY}",
+                  "model_id": "eleven_multilingual_v2",
+                  "voice_id": "pNInz6obpgDQGcFmaJgB",
+                  "output_format": "pcm_16000"
+                }
+              }
+            },
+            {
+              "type": "extension",
+              "name": "main_control",
+              "addon": "court_debate_control_python",
+              "extension_group": "control",
+              "property": {
+                "greeting": "法庭AI辩护助手已就绪（通义千问驱动）。我将基于法律和事实为您提供专业答辩意见。请问有什么问题？"
+              }
+            },
+            {
+              "type": "extension",
+              "name": "message_collector",
+              "addon": "message_collector2",
+              "extension_group": "transcriber",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "streamid_adapter",
+              "addon": "streamid_adapter",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "legal_knowledge",
+              "addon": "legal_knowledge_python",
+              "extension_group": "tools",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "case_analyzer",
+              "addon": "case_analyzer_python",
+              "extension_group": "tools",
+              "property": {
+                "case_info": {
+                  "case_number": "案号待定",
+                  "case_type": "criminal",
+                  "role": "defendant",
+                  "description": "刑事辩护案件",
+                  "facts": [],
+                  "evidence": [],
+                  "defendant_statement": "",
+                  "prosecution_claims": []
+                }
+              }
+            }
+          ],
+          "connections": [
+            {
+              "extension": "main_control",
+              "cmd": [
+                {
+                  "names": ["on_user_joined", "on_user_left"],
+                  "source": [{"extension": "agora_rtc"}]
+                },
+                {
+                  "names": ["tool_register"],
+                  "source": [
+                    {"extension": "legal_knowledge"},
+                    {"extension": "case_analyzer"}
                   ]
+                }
+              ],
+              "data": [
+                {
+                  "name": "asr_result",
+                  "source": [{"extension": "stt"}]
+                }
+              ]
+            },
+            {
+              "extension": "agora_rtc",
+              "audio_frame": [
+                {
+                  "name": "pcm_frame",
+                  "dest": [{"extension": "streamid_adapter"}]
+                },
+                {
+                  "name": "pcm_frame",
+                  "source": [{"extension": "tts"}]
+                }
+              ],
+              "data": [
+                {
+                  "name": "data",
+                  "source": [{"extension": "message_collector"}]
+                }
+              ]
+            },
+            {
+              "extension": "streamid_adapter",
+              "audio_frame": [
+                {
+                  "name": "pcm_frame",
+                  "dest": [{"extension": "stt"}]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "ai_court_debate_kimi",
+        "auto_start": false,
+        "graph": {
+          "nodes": [
+            {
+              "type": "extension",
+              "name": "agora_rtc",
+              "addon": "agora_rtc",
+              "extension_group": "default",
+              "property": {
+                "app_id": "${env:AGORA_APP_ID}",
+                "app_certificate": "${env:AGORA_APP_CERTIFICATE|}",
+                "channel": "court_debate_channel",
+                "stream_id": 1234,
+                "remote_stream_id": 123,
+                "subscribe_audio": true,
+                "publish_audio": true,
+                "publish_data": true,
+                "enable_agora_asr": false
+              }
+            },
+            {
+              "type": "extension",
+              "name": "stt",
+              "addon": "deepgram_asr_python",
+              "extension_group": "stt",
+              "property": {
+                "params": {
+                  "api_key": "${env:DEEPGRAM_API_KEY}",
+                  "language": "zh-CN",
+                  "model": "nova-3"
+                }
+              }
+            },
+            {
+              "type": "extension",
+              "name": "llm",
+              "addon": "openai_llm2_python",
+              "extension_group": "chatgpt",
+              "property": {
+                "base_url": "https://api.moonshot.cn/v1",
+                "api_key": "${env:MOONSHOT_API_KEY}",
+                "model": "moonshot-v1-32k",
+                "max_tokens": 2048,
+                "frequency_penalty": 0.5,
+                "prompt": "你是一位经验丰富的中国法律AI助手，专门协助进行法庭辩论和答辩。\n\n你的职责是：\n1. 仔细聆听法官和对方的问题\n2. 基于案件事实和中国现行法律条文提供专业的答辩意见\n3. 引用具体的法律条文编号和内容\n4. 保持专业、客观、有理有据的态度\n5. 在必要时调用法律知识库和案情分析工具\n\n请始终遵循以下法律原则：\n- 无罪推定：在判决前应假定被告无罪\n- 疑罪从无：证据不足时应作出有利于被告的判断\n- 证据确实充分：定罪需要达到排除合理怀疑的证明标准\n- 罪刑法定：法无明文规定不为罪、不处罚\n\n在回答时要：\n- 使用标准法律用语\n- 逻辑清晰，重点突出\n- 引用《刑法》《民法典》等具体条文\n- 结合案件事实进行分析\n\n可用工具：\n- search_legal_knowledge: 搜索相关法律条文\n- analyze_case: 分析案件情况和辩论策略",
+                "greeting": "法庭AI辩护助手（Kimi月之暗面驱动）已就绪。我将基于中国法律和案件事实为您提供专业答辩。",
+                "max_memory_length": 30
+              }
+            },
+            {
+              "type": "extension",
+              "name": "tts",
+              "addon": "elevenlabs_tts2_python",
+              "extension_group": "tts",
+              "property": {
+                "dump": false,
+                "dump_path": "./",
+                "params": {
+                  "key": "${env:ELEVENLABS_TTS_KEY}",
+                  "model_id": "eleven_multilingual_v2",
+                  "voice_id": "pNInz6obpgDQGcFmaJgB",
+                  "output_format": "pcm_16000"
+                }
+              }
+            },
+            {
+              "type": "extension",
+              "name": "main_control",
+              "addon": "court_debate_control_python",
+              "extension_group": "control",
+              "property": {
+                "greeting": "法庭AI辩护助手已就绪（Kimi驱动）。我将基于法律和事实为您提供专业答辩意见。请问有什么问题？"
+              }
+            },
+            {
+              "type": "extension",
+              "name": "message_collector",
+              "addon": "message_collector2",
+              "extension_group": "transcriber",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "streamid_adapter",
+              "addon": "streamid_adapter",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "legal_knowledge",
+              "addon": "legal_knowledge_python",
+              "extension_group": "tools",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "case_analyzer",
+              "addon": "case_analyzer_python",
+              "extension_group": "tools",
+              "property": {
+                "case_info": {
+                  "case_number": "案号待定",
+                  "case_type": "criminal",
+                  "role": "defendant",
+                  "description": "刑事辩护案件",
+                  "facts": [],
+                  "evidence": [],
+                  "defendant_statement": "",
+                  "prosecution_claims": []
+                }
+              }
+            }
+          ],
+          "connections": [
+            {
+              "extension": "main_control",
+              "cmd": [
+                {
+                  "names": ["on_user_joined", "on_user_left"],
+                  "source": [{"extension": "agora_rtc"}]
+                },
+                {
+                  "names": ["tool_register"],
+                  "source": [
+                    {"extension": "legal_knowledge"},
+                    {"extension": "case_analyzer"}
+                  ]
+                }
+              ],
+              "data": [
+                {
+                  "name": "asr_result",
+                  "source": [{"extension": "stt"}]
+                }
+              ]
+            },
+            {
+              "extension": "agora_rtc",
+              "audio_frame": [
+                {
+                  "name": "pcm_frame",
+                  "dest": [{"extension": "streamid_adapter"}]
+                },
+                {
+                  "name": "pcm_frame",
+                  "source": [{"extension": "tts"}]
+                }
+              ],
+              "data": [
+                {
+                  "name": "data",
+                  "source": [{"extension": "message_collector"}]
+                }
+              ]
+            },
+            {
+              "extension": "streamid_adapter",
+              "audio_frame": [
+                {
+                  "name": "pcm_frame",
+                  "dest": [{"extension": "stt"}]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "ai_court_debate_glm",
+        "auto_start": false,
+        "graph": {
+          "nodes": [
+            {
+              "type": "extension",
+              "name": "agora_rtc",
+              "addon": "agora_rtc",
+              "extension_group": "default",
+              "property": {
+                "app_id": "${env:AGORA_APP_ID}",
+                "app_certificate": "${env:AGORA_APP_CERTIFICATE|}",
+                "channel": "court_debate_channel",
+                "stream_id": 1234,
+                "remote_stream_id": 123,
+                "subscribe_audio": true,
+                "publish_audio": true,
+                "publish_data": true,
+                "enable_agora_asr": false
+              }
+            },
+            {
+              "type": "extension",
+              "name": "stt",
+              "addon": "deepgram_asr_python",
+              "extension_group": "stt",
+              "property": {
+                "params": {
+                  "api_key": "${env:DEEPGRAM_API_KEY}",
+                  "language": "zh-CN",
+                  "model": "nova-3"
+                }
+              }
+            },
+            {
+              "type": "extension",
+              "name": "llm",
+              "addon": "openai_llm2_python",
+              "extension_group": "chatgpt",
+              "property": {
+                "base_url": "https://open.bigmodel.cn/api/paas/v4",
+                "api_key": "${env:ZHIPU_API_KEY}",
+                "model": "glm-4",
+                "max_tokens": 2048,
+                "frequency_penalty": 0.5,
+                "prompt": "你是一位经验丰富的中国法律AI助手，专门协助进行法庭辩论和答辩。\n\n你的职责是：\n1. 仔细聆听法官和对方的问题\n2. 基于案件事实和中国现行法律条文提供专业的答辩意见\n3. 引用具体的法律条文编号和内容\n4. 保持专业、客观、有理有据的态度\n5. 在必要时调用法律知识库和案情分析工具\n\n请始终遵循以下法律原则：\n- 无罪推定：在判决前应假定被告无罪\n- 疑罪从无：证据不足时应作出有利于被告的判断\n- 证据确实充分：定罪需要达到排除合理怀疑的证明标准\n- 罪刑法定：法无明文规定不为罪、不处罚\n\n在回答时要：\n- 使用标准法律用语\n- 逻辑清晰，重点突出\n- 引用《刑法》《民法典》等具体条文\n- 结合案件事实进行分析\n\n可用工具：\n- search_legal_knowledge: 搜索相关法律条文\n- analyze_case: 分析案件情况和辩论策略",
+                "greeting": "法庭AI辩护助手（智谱GLM驱动）已就绪。我将基于中国法律和案件事实为您提供专业答辩。",
+                "max_memory_length": 30
+              }
+            },
+            {
+              "type": "extension",
+              "name": "tts",
+              "addon": "elevenlabs_tts2_python",
+              "extension_group": "tts",
+              "property": {
+                "dump": false,
+                "dump_path": "./",
+                "params": {
+                  "key": "${env:ELEVENLABS_TTS_KEY}",
+                  "model_id": "eleven_multilingual_v2",
+                  "voice_id": "pNInz6obpgDQGcFmaJgB",
+                  "output_format": "pcm_16000"
+                }
+              }
+            },
+            {
+              "type": "extension",
+              "name": "main_control",
+              "addon": "court_debate_control_python",
+              "extension_group": "control",
+              "property": {
+                "greeting": "法庭AI辩护助手已就绪（智谱GLM驱动）。我将基于法律和事实为您提供专业答辩意见。请问有什么问题？"
+              }
+            },
+            {
+              "type": "extension",
+              "name": "message_collector",
+              "addon": "message_collector2",
+              "extension_group": "transcriber",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "streamid_adapter",
+              "addon": "streamid_adapter",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "legal_knowledge",
+              "addon": "legal_knowledge_python",
+              "extension_group": "tools",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "case_analyzer",
+              "addon": "case_analyzer_python",
+              "extension_group": "tools",
+              "property": {
+                "case_info": {
+                  "case_number": "案号待定",
+                  "case_type": "criminal",
+                  "role": "defendant",
+                  "description": "刑事辩护案件",
+                  "facts": [],
+                  "evidence": [],
+                  "defendant_statement": "",
+                  "prosecution_claims": []
+                }
+              }
+            }
+          ],
+          "connections": [
+            {
+              "extension": "main_control",
+              "cmd": [
+                {
+                  "names": ["on_user_joined", "on_user_left"],
+                  "source": [{"extension": "agora_rtc"}]
+                },
+                {
+                  "names": ["tool_register"],
+                  "source": [
+                    {"extension": "legal_knowledge"},
+                    {"extension": "case_analyzer"}
+                  ]
+                }
+              ],
+              "data": [
+                {
+                  "name": "asr_result",
+                  "source": [{"extension": "stt"}]
+                }
+              ]
+            },
+            {
+              "extension": "agora_rtc",
+              "audio_frame": [
+                {
+                  "name": "pcm_frame",
+                  "dest": [{"extension": "streamid_adapter"}]
+                },
+                {
+                  "name": "pcm_frame",
+                  "source": [{"extension": "tts"}]
+                }
+              ],
+              "data": [
+                {
+                  "name": "data",
+                  "source": [{"extension": "message_collector"}]
+                }
+              ]
+            },
+            {
+              "extension": "streamid_adapter",
+              "audio_frame": [
+                {
+                  "name": "pcm_frame",
+                  "dest": [{"extension": "stt"}]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "ai_court_debate_doubao",
+        "auto_start": false,
+        "graph": {
+          "nodes": [
+            {
+              "type": "extension",
+              "name": "agora_rtc",
+              "addon": "agora_rtc",
+              "extension_group": "default",
+              "property": {
+                "app_id": "${env:AGORA_APP_ID}",
+                "app_certificate": "${env:AGORA_APP_CERTIFICATE|}",
+                "channel": "court_debate_channel",
+                "stream_id": 1234,
+                "remote_stream_id": 123,
+                "subscribe_audio": true,
+                "publish_audio": true,
+                "publish_data": true,
+                "enable_agora_asr": false
+              }
+            },
+            {
+              "type": "extension",
+              "name": "stt",
+              "addon": "deepgram_asr_python",
+              "extension_group": "stt",
+              "property": {
+                "params": {
+                  "api_key": "${env:DEEPGRAM_API_KEY}",
+                  "language": "zh-CN",
+                  "model": "nova-3"
+                }
+              }
+            },
+            {
+              "type": "extension",
+              "name": "llm",
+              "addon": "openai_llm2_python",
+              "extension_group": "chatgpt",
+              "property": {
+                "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+                "api_key": "${env:DOUBAO_API_KEY}",
+                "model": "${env:DOUBAO_MODEL|doubao-pro-32k}",
+                "max_tokens": 2048,
+                "frequency_penalty": 0.5,
+                "prompt": "你是一位经验丰富的中国法律AI助手，专门协助进行法庭辩论和答辩。\n\n你的职责是：\n1. 仔细聆听法官和对方的问题\n2. 基于案件事实和中国现行法律条文提供专业的答辩意见\n3. 引用具体的法律条文编号和内容\n4. 保持专业、客观、有理有据的态度\n5. 在必要时调用法律知识库和案情分析工具\n\n请始终遵循以下法律原则：\n- 无罪推定：在判决前应假定被告无罪\n- 疑罪从无：证据不足时应作出有利于被告的判断\n- 证据确实充分：定罪需要达到排除合理怀疑的证明标准\n- 罪刑法定：法无明文规定不为罪、不处罚\n\n在回答时要：\n- 使用标准法律用语\n- 逻辑清晰，重点突出\n- 引用《刑法》《民法典》等具体条文\n- 结合案件事实进行分析\n\n可用工具：\n- search_legal_knowledge: 搜索相关法律条文\n- analyze_case: 分析案件情况和辩论策略",
+                "greeting": "法庭AI辩护助手（字节豆包驱动）已就绪。我将基于中国法律和案件事实为您提供专业答辩。",
+                "max_memory_length": 30
+              }
+            },
+            {
+              "type": "extension",
+              "name": "tts",
+              "addon": "elevenlabs_tts2_python",
+              "extension_group": "tts",
+              "property": {
+                "dump": false,
+                "dump_path": "./",
+                "params": {
+                  "key": "${env:ELEVENLABS_TTS_KEY}",
+                  "model_id": "eleven_multilingual_v2",
+                  "voice_id": "pNInz6obpgDQGcFmaJgB",
+                  "output_format": "pcm_16000"
+                }
+              }
+            },
+            {
+              "type": "extension",
+              "name": "main_control",
+              "addon": "court_debate_control_python",
+              "extension_group": "control",
+              "property": {
+                "greeting": "法庭AI辩护助手已就绪（豆包驱动）。我将基于法律和事实为您提供专业答辩意见。请问有什么问题？"
+              }
+            },
+            {
+              "type": "extension",
+              "name": "message_collector",
+              "addon": "message_collector2",
+              "extension_group": "transcriber",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "streamid_adapter",
+              "addon": "streamid_adapter",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "legal_knowledge",
+              "addon": "legal_knowledge_python",
+              "extension_group": "tools",
+              "property": {}
+            },
+            {
+              "type": "extension",
+              "name": "case_analyzer",
+              "addon": "case_analyzer_python",
+              "extension_group": "tools",
+              "property": {
+                "case_info": {
+                  "case_number": "案号待定",
+                  "case_type": "criminal",
+                  "role": "defendant",
+                  "description": "刑事辩护案件",
+                  "facts": [],
+                  "evidence": [],
+                  "defendant_statement": "",
+                  "prosecution_claims": []
+                }
+              }
+            }
+          ],
+          "connections": [
+            {
+              "extension": "main_control",
+              "cmd": [
+                {
+                  "names": ["on_user_joined", "on_user_left"],
+                  "source": [{"extension": "agora_rtc"}]
+                },
+                {
+                  "names": ["tool_register"],
+                  "source": [
+                    {"extension": "legal_knowledge"},
+                    {"extension": "case_analyzer"}
+                  ]
+                }
+              ],
+              "data": [
+                {
+                  "name": "asr_result",
+                  "source": [{"extension": "stt"}]
+                }
+              ]
+            },
+            {
+              "extension": "agora_rtc",
+              "audio_frame": [
+                {
+                  "name": "pcm_frame",
+                  "dest": [{"extension": "streamid_adapter"}]
+                },
+                {
+                  "name": "pcm_frame",
+                  "source": [{"extension": "tts"}]
+                }
+              ],
+              "data": [
+                {
+                  "name": "data",
+                  "source": [{"extension": "message_collector"}]
+                }
+              ]
+            },
+            {
+              "extension": "streamid_adapter",
+              "audio_frame": [
+                {
+                  "name": "pcm_frame",
+                  "dest": [{"extension": "stt"}]
                 }
               ]
             }

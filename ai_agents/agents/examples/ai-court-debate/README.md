@@ -71,6 +71,20 @@
 | **Case Analyzer** | 案情分析器 | Python Extension |
 | **Court Debate Control** | 主控制逻辑 | Python Extension |
 
+## 🤖 支持的国产大模型
+
+系统提供 5 个预定义图，对应 5 种主流国产大模型（通过 OpenAI 兼容 API 接入）：
+
+| 图名称 | 模型 | 提供商 | API Base URL |
+|--------|------|--------|--------------|
+| `ai_court_debate_deepseek` ⭐（默认） | deepseek-chat / deepseek-reasoner | [DeepSeek](https://platform.deepseek.com/) | `https://api.deepseek.com/v1` |
+| `ai_court_debate_qwen` | qwen-max / qwen-plus | [通义千问(阿里云)](https://dashscope.aliyun.com/) | `https://dashscope.aliyuncs.com/compatible-mode/v1` |
+| `ai_court_debate_kimi` | moonshot-v1-32k | [Kimi(月之暗面)](https://platform.moonshot.cn/) | `https://api.moonshot.cn/v1` |
+| `ai_court_debate_glm` | glm-4 / glm-4-flash | [智谱AI(GLM)](https://open.bigmodel.cn/) | `https://open.bigmodel.cn/api/paas/v4` |
+| `ai_court_debate_doubao` | doubao-pro-32k | [豆包(字节跳动)](https://www.volcengine.com/product/ark) | `https://ark.cn-beijing.volces.com/api/v3` |
+
+> **推荐**：优先使用 **DeepSeek**（默认），中文理解能力强，推理模型（R1）擅长逻辑分析，非常适合法律场景。
+
 ## 🚀 快速开始
 
 ### 前置要求
@@ -80,10 +94,10 @@
    - Go 1.22+
    - Python 3.10+
 
-2. **API Keys**（需要申请以下服务的 API 密钥）
+2. **API Keys**（至少需要以下服务的 API 密钥）
    - [Agora](https://www.agora.io/) - 实时音视频
-   - [Deepgram](https://deepgram.com/) - 语音识别
-   - [OpenAI](https://openai.com/) - 大语言模型
+   - [Deepgram](https://deepgram.com/) - 语音识别（支持中文）
+   - **国产大模型之一**（见上表，推荐 DeepSeek）
    - [ElevenLabs](https://elevenlabs.io/) - 语音合成
 
 ### 安装步骤
@@ -94,21 +108,29 @@
    ```
 
 2. **配置环境变量**
-   创建 `.env` 文件并配置 API 密钥：
+   复制 `.env.example` 为 `.env` 并填入 API 密钥：
    ```bash
-   # Agora 配置
-   export AGORA_APP_ID="your_agora_app_id"
-   export AGORA_APP_CERTIFICATE="your_agora_certificate"
+   cp .env.example .env
+   ```
 
-   # Deepgram ASR
-   export DEEPGRAM_API_KEY="your_deepgram_api_key"
+   根据想用的国产大模型，至少填写对应的 API Key：
+   ```bash
+   # Agora 配置（必填）
+   AGORA_APP_ID=your_agora_app_id
+   AGORA_APP_CERTIFICATE=your_agora_certificate
 
-   # OpenAI LLM
-   export OPENAI_API_KEY="your_openai_api_key"
-   export OPENAI_MODEL="gpt-4o"
+   # Deepgram ASR（必填，支持中文）
+   DEEPGRAM_API_KEY=your_deepgram_api_key
 
-   # ElevenLabs TTS
-   export ELEVENLABS_TTS_KEY="your_elevenlabs_api_key"
+   # 选一个国产大模型（必填其一）
+   DEEPSEEK_API_KEY=sk-xxxx          # DeepSeek（推荐）
+   # DASHSCOPE_API_KEY=sk-xxxx       # 通义千问
+   # MOONSHOT_API_KEY=sk-xxxx        # Kimi
+   # ZHIPU_API_KEY=xxxx.xxxx         # 智谱GLM
+   # DOUBAO_API_KEY=xxxx             # 字节豆包
+
+   # ElevenLabs TTS（必填）
+   ELEVENLABS_TTS_KEY=your_elevenlabs_api_key
    ```
 
 3. **安装依赖**
@@ -128,12 +150,23 @@
    go build -o bin/app main.go
    ```
 
-5. **启动服务**
+5. **启动服务**（选择国产大模型）
    ```bash
-   ./scripts/start.sh
-
-   # 或直接运行
+   # 使用 DeepSeek（默认，推荐）
    ./bin/app
+   # 等价于加载 ai_court_debate_deepseek 图
+
+   # 使用通义千问
+   ./bin/app -graph ai_court_debate_qwen
+
+   # 使用 Kimi
+   ./bin/app -graph ai_court_debate_kimi
+
+   # 使用智谱 GLM
+   ./bin/app -graph ai_court_debate_glm
+
+   # 使用字节豆包
+   ./bin/app -graph ai_court_debate_doubao
    ```
 
 ## 💼 使用指南
@@ -143,15 +176,15 @@
 1. **启动服务后**，系统会输出：
    ```
    AI Court Debate Agent Starting...
-   法庭AI辩护助手已就绪
+   法庭AI辩护助手已就绪（DeepSeek驱动）
    ```
 
 2. **连接到频道**
    - 使用 Agora SDK 客户端连接到频道 `court_debate_channel`
-   - 系统会播放欢迎语
+   - 系统会播放欢迎语（含当前使用的模型名）
 
 3. **开始对话**
-   - 通过麦克风说话，系统会实时识别
+   - 通过麦克风说话，系统会实时识别（中文优先）
    - AI 会基于法律知识和案情分析生成答辩意见
    - 答辩意见会通过语音输出
 
